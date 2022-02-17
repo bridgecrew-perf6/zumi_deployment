@@ -1,0 +1,46 @@
+version: '3'
+services:
+  # backend
+  backend:
+    container_name: zumi_api
+    restart: always
+    image: kaliosobomabo2/zumi_api
+    command: npm run dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./:/api
+      - /app/node_modules
+    links:
+      - mongodb
+    depends_on:
+      - mongodb
+    environment:
+      WAIT_HOSTS: mongodb:27017
+    networks:
+      - zumi-network
+  # mongodb
+  mongodb:
+    container_name: mongodb
+    image: mongo:5.0.1
+    volumes:
+      - ~/mongo:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - zumi-network
+  # frontend
+  frontend:
+    image: kaliosobomabo2/zumi_app
+    command: npm run start
+    container_name: zumi_app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/frontend
+      - /app/node_modules
+    networks:
+      - zumi-network
+networks:
+  zumi-network:
+    driver: bridge
